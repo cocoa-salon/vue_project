@@ -1,6 +1,6 @@
 <template>
   <div class="contentslist-area">
-    <FilterModal v-if="isModalOn" />
+    <FilterModal v-on:update-check="updateCheck" v-if="isModalOn" v-bind:isCategoryChecked="isCategoryChecked" />
     <div class="nav-tool">
       <button class="btn btn-info" @click="toggleModal">필터</button>
       <button class="btn btn-primary">오름차순</button>
@@ -25,12 +25,23 @@ export default {
   name: "ContentsList",
   data: () => ({
     myNum: 12345,
-    isModalOn: false
+    isModalOn: false,
+    isCategoryChecked: {
+      category1: true,
+      category2: true,
+      category3: true
+    }
   }),
   methods: {
     toggleModal () {
       console.log(`isModalOn : ${this.isModalOn}`)
       this.isModalOn = !this.isModalOn
+    },
+    updateCheck (checked, boxName) {
+      this.isCategoryChecked = { ...this.isCategoryChecked, [boxName]: checked }
+      // console.log(checked)
+      // console.log(boxName)
+      console.log(this.isCategoryChecked)
     }
   },
   mounted () {
