@@ -4,7 +4,7 @@
       v-if="isModalOn"
       v-on:update-check="updateCheck"
       v-on:toggle-modal="toggleModal"
-      v-on:save-option="getSearch"
+      v-on:save-option="filterListOnCategory"
       v-bind:isCategoryChecked="isCategoryChecked"
       v-bind:isModalOn="isModalOn"
     />
@@ -36,12 +36,22 @@ export default {
       asc: 100,
       desc: 2
     },
+
     switchedSortOption: "desc",
     isCategoryChecked: {
       category1: true,
       category2: true,
       category3: true
-    }
+    },
+
+    categoryExample: {
+      category1: "1",
+      category2: "2",
+      category3: "3"
+    },
+
+    category: ["1", "2", "3"]
+
   }),
   methods: {
     // X버튼 : 모달 창 토글
@@ -50,16 +60,23 @@ export default {
     },
 
     // 카테고리 체크 상태 업데이트
-    updateCheck (checked, boxName) {
+    updateCheck (boxName, checked) {
       this.isCategoryChecked = {
         ...this.isCategoryChecked,
         [boxName]: checked
       }
-      console.log(this.isCategoryChecked)
+      this.updateCategory(boxName, checked)
     },
 
-    getSearch () {
-      console.log("API 요청")
+    // 체크 상태에 따라 필터 카테고리 옵션 업데이트
+    updateCategory (boxName, checked) {
+      if (this.isCategoryChecked[boxName] === true) {
+        this.category.push(this.categoryExample[boxName])
+      } else {
+        this.category = this.category.filter((v, i) => {
+          return v !== this.categoryExample[boxName]
+        })
+      }
     },
 
     // 오름차순 정렬
@@ -82,12 +99,17 @@ export default {
       this.ord.desc++
     },
 
+    filterListOnCategory () {
+      console.log("hello!")
+    },
+
     // 정렬 옵션 전환 후 초기 리스트 요청
     requestListAfterSwitchSort (pageNum, sortLogic) {
       this.itemList = []
       this.$http
         .get(`http://comento.cafe24.com/request.php/?page=${pageNum}`)
         .then(response => {
+          // 카테고리 필터링
           if (sortLogic) {
             const sortedList = sortLogic(response.data.list)
             this.itemList = [...sortedList]
@@ -109,6 +131,7 @@ export default {
             }`
           )
           .then(response => {
+            // 카테고리 필터링
             if (this.switchedSortOption === "asc") {
               const sortedList = this.sortToAsc(response.data.list)
               this.itemList = [...this.itemList, ...sortedList]
