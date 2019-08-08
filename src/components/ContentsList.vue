@@ -2,11 +2,11 @@
   <div class="contentslist-area">
     <FilterModal
       v-if="isModalOn"
-      v-on:update-check="updateCheck"
       v-on:toggle-modal="toggleModal"
       v-on:handle-save-click="requestFilteredList"
-      v-bind:isCategoryChecked="isCategoryChecked"
       v-bind:isModalOn="isModalOn"
+      v-bind:categoryInfo="categoryInfo"
+      v-bind:categoryLists="categoryLists"
     />
     <div class="nav-tool">
       <button class="btn btn-info" @click="toggleModal">필터</button>
@@ -36,21 +36,10 @@ export default {
       asc: 100,
       desc: 2
     },
-
     switchedSortOption: "desc",
-    isCategoryChecked: {
-      category1: true,
-      category2: true,
-      category3: true
-    },
-
-    categoryExample: {
-      category1: "1",
-      category2: "2",
-      category3: "3"
-    },
-
-    category: ["1", "2", "3"]
+    categoryInfo: {},
+    category: [],
+    categoryLists: {}
   }),
   methods: {
     // X버튼 : 모달 창 토글
@@ -58,24 +47,23 @@ export default {
       this.isModalOn = !this.isModalOn
     },
 
-    // 카테고리 체크 상태 업데이트
-    updateCheck (boxName, checked) {
-      this.isCategoryChecked = {
-        ...this.isCategoryChecked,
-        [boxName]: checked
-      }
-      this.updateCategory(boxName, checked)
+    makeCategoryList () {
+      return this.categoryInfo.reduce((acc, v, i) => {
+        let obj = {}
+        obj.no = v["no"]
+        obj.checked = true
+        acc[v["name"]] = obj
+        return acc
+      }, {})
     },
 
-    // 체크 상태에 따라 필터 카테고리 옵션 업데이트
-    updateCategory (boxName, checked) {
-      if (this.isCategoryChecked[boxName] === true) {
-        this.category.push(this.categoryExample[boxName])
-      } else {
-        this.category = this.category.filter((v, i) => {
-          return v !== this.categoryExample[boxName]
-        })
-      }
+    makeCategory () {
+      let arr = Object.keys(this.categoryLists)
+      return arr.filter((v, i) => {
+        if (this.categoryLists[v]["checked"]) {
+          return v
+        }
+      })
     },
 
     // 오름차순 정렬
@@ -100,14 +88,22 @@ export default {
 
     // 저장 버튼 클릭 시 카테고리 조건에 따라 리스트 요청
     requestFilteredList () {
+      this.category = this.makeCategory()
+      console.log(this.category)
       this.requestListAfterSwitchSort((this.ord.desc = 1))
     },
 
     // 카테고리 옵션에 따라 리스트 필터링
     filterListOnCategory (responseArr) {
-      return responseArr.filter((v, i) => {
-        if (this.category.includes(v["category_no"])) return v
+      const filteredList = []
+      responseArr.forEach(v => {
+        this.category.forEach(v2 => {
+          if (this.categoryLists[v2]["no"] === v["category_no"]) {
+            filteredList.push(v)
+          }
+        })
       })
+      return filteredList
     },
 
     // 정렬 옵션 전환 후 초기 리스트 요청
@@ -155,12 +151,18 @@ export default {
   // 컴포넌트 마운트 시 리스트 요청
   mounted () {
     console.log("Component mounted.")
+    window.addEventListener("scroll", this.requestListWhenScroll)
     this.$http
       .get(`http://comento.cafe24.com/request.php/?page=${this.ord.desc - 1}`)
       .then(response => {
         this.itemList = [...response.data.list]
       })
-    window.addEventListener("scroll", this.requestListWhenScroll)
+    this.$http.get(`http://comento.cafe24.com/category.php`).then(response => {
+      console.log(response)
+      this.categoryInfo = response.data.list
+      this.categoryLists = this.makeCategoryList()
+      this.category = this.makeCategory()
+    })
   }
 }
 </script>
