@@ -7,7 +7,7 @@
       <input type="checkbox" v-model="isCategoryChecked.category2"  name="category2" value="category2" />카테고리2
       <input type="checkbox" v-model="isCategoryChecked.category3"  name="category3" value="category3" />카테고리3
     </div>
-    <button @click="saveOption">저장</button>
+    <button @click="handleSaveClick">저장</button>
   </div>
 </template>
 
@@ -17,8 +17,9 @@ export default {
   props: ["isCategoryChecked", "isModalOn"],
   methods: {
     // 부모 메서드 호출(카테고리 별 GET 요청)
-    saveOption () {
-      this.$emit('save-option')
+    handleSaveClick () {
+      this.$emit('handle-save-click')
+      this.handleModalToggle()
     },
     // 부모 메서드 호출(체크 상태 업데이트)
     handleCheck (e) {

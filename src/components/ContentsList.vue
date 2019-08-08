@@ -4,7 +4,7 @@
       v-if="isModalOn"
       v-on:update-check="updateCheck"
       v-on:toggle-modal="toggleModal"
-      v-on:save-option="saveOption"
+      v-on:handle-save-click="requestFilteredList"
       v-bind:isCategoryChecked="isCategoryChecked"
       v-bind:isModalOn="isModalOn"
     />
@@ -98,7 +98,8 @@ export default {
       this.ord.desc++
     },
 
-    saveOption () {
+    // 저장 버튼 클릭 시 카테고리 조건에 따라 리스트 요청
+    requestFilteredList () {
       this.requestListAfterSwitchSort((this.ord.desc = 1))
     },
 
@@ -150,6 +151,7 @@ export default {
       }
     }
   },
+
   // 컴포넌트 마운트 시 리스트 요청
   mounted () {
     console.log("Component mounted.")
