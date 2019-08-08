@@ -3,9 +3,9 @@
     <h3>필터</h3>
     <div style="cursor:pointer" @click="handleModalToggle">X</div>
     <div class="category-check" @click="handleCheck">
-      <input type="checkbox" checked="checked" name="category1" value="category1" />카테고리1
-      <input type="checkbox" checked="checked" name="category2" value="category2" />카테고리2
-      <input type="checkbox" checked="checked" name="category3" value="category3" />카테고리3
+      <input type="checkbox" v-model="isCategoryChecked.category1" name="category1" value="category1" />카테고리1
+      <input type="checkbox" v-model="isCategoryChecked.category2"  name="category2" value="category2" />카테고리2
+      <input type="checkbox" v-model="isCategoryChecked.category3"  name="category3" value="category3" />카테고리3
     </div>
     <button @click="saveOption">저장</button>
   </div>

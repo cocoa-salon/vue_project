@@ -4,7 +4,7 @@
       v-if="isModalOn"
       v-on:update-check="updateCheck"
       v-on:toggle-modal="toggleModal"
-      v-on:save-option="filterListOnCategory"
+      v-on:save-option="saveOption"
       v-bind:isCategoryChecked="isCategoryChecked"
       v-bind:isModalOn="isModalOn"
     />
@@ -51,7 +51,6 @@ export default {
     },
 
     category: ["1", "2", "3"]
-
   }),
   methods: {
     // X버튼 : 모달 창 토글
@@ -99,8 +98,15 @@ export default {
       this.ord.desc++
     },
 
-    filterListOnCategory () {
-      console.log("hello!")
+    saveOption () {
+      this.requestListAfterSwitchSort((this.ord.desc = 1))
+    },
+
+    // 카테고리 옵션에 따라 리스트 필터링
+    filterListOnCategory (responseArr) {
+      return responseArr.filter((v, i) => {
+        if (this.category.includes(v["category_no"])) return v
+      })
     },
 
     // 정렬 옵션 전환 후 초기 리스트 요청
@@ -110,10 +116,11 @@ export default {
         .get(`http://comento.cafe24.com/request.php/?page=${pageNum}`)
         .then(response => {
           // 카테고리 필터링
+          const filteredList = this.filterListOnCategory(response.data.list)
           if (sortLogic) {
-            const sortedList = sortLogic(response.data.list)
+            const sortedList = sortLogic(filteredList)
             this.itemList = [...sortedList]
-          } else this.itemList = [...response.data.list]
+          } else this.itemList = [...filteredList]
         })
     },
 
@@ -132,10 +139,11 @@ export default {
           )
           .then(response => {
             // 카테고리 필터링
+            const filteredList = this.filterListOnCategory(response.data.list)
             if (this.switchedSortOption === "asc") {
-              const sortedList = this.sortToAsc(response.data.list)
+              const sortedList = this.sortToAsc(filteredList)
               this.itemList = [...this.itemList, ...sortedList]
-            } else this.itemList = [...this.itemList, ...response.data.list]
+            } else this.itemList = [...this.itemList, ...filteredList]
             if (this.switchedSortOption === "asc") this.ord.asc--
             else this.ord.desc++
           })
