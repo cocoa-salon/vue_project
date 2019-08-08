@@ -39,7 +39,13 @@ export default {
     switchedSortOption: "desc",
     categoryInfo: {},
     category: [],
-    categoryLists: {}
+    categoryLists: {},
+    adsList: [],
+    adsListPage: 1,
+    standardNum: 4,
+    listLength: 10,
+    currentIndex: 3,
+    count: 0
   }),
   methods: {
     // X버튼 : 모달 창 토글
@@ -88,9 +94,27 @@ export default {
 
     // 저장 버튼 클릭 시 카테고리 조건에 따라 리스트 요청
     requestFilteredList () {
+      this.adsList = []
+      this.itemList = []
       this.category = this.makeCategory()
       this.requestListAfterSwitchSort((this.ord.desc = 1))
       this.ord.desc++
+    },
+
+    // 광고 삽입 로직
+    insertAds (sortedList) {
+      for (let v of this.adsList) {
+        v['isAd'] = true
+        sortedList.splice(this.currentIndex, 0, v)
+        this.count++
+        this.currentIndex += this.standardNum
+        if (this.currentIndex >= this.listLength + 3) {
+          this.currentIndex -= this.listLength + 3
+          this.adsList.splice(0, this.count)
+          this.count = 0
+          return
+        }
+      }
     },
 
     // 카테고리 옵션에 따라 리스트 필터링
@@ -108,17 +132,33 @@ export default {
 
     // 정렬 옵션 전환 후 초기 리스트 요청
     requestListAfterSwitchSort (pageNum, sortLogic) {
-      this.itemList = []
-      this.$http
+      this.currentIndex = 3
+      this.adsListPage = 1
+      const promise1 = this.$http
         .get(`http://comento.cafe24.com/request.php/?page=${pageNum}`)
-        .then(response => {
-          // 카테고리 필터링
-          const filteredList = this.filterListOnCategory(response.data.list)
-          if (sortLogic) {
-            const sortedList = sortLogic(filteredList)
-            this.itemList = [...sortedList]
-          } else this.itemList = [...filteredList]
-        })
+
+      const promise2 =
+            this.$http.get(`http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`)
+
+      Promise.all([promise1, promise2]).then(response => {
+        // 카테고리 필터링
+        const filteredList = this.filterListOnCategory(response[0].data.list)
+        // console.log(filteredList)
+        this.adsList = response[1].data.list
+        if (sortLogic) {
+          // 정렬 로직 적용
+          const sortedList = sortLogic(filteredList)
+          // 광고 삽입 로직
+          this.insertAds(sortedList)
+          this.itemList = [...sortedList]
+          this.adsListPage++
+        } else {
+          // 광고 삽입 로직
+          this.insertAds(filteredList)
+          this.itemList = [...filteredList]
+          this.adsListPage++
+        }
+      })
     },
 
     // 스크롤링 시 리스트 요청
@@ -128,22 +168,43 @@ export default {
       const innerHeight = window.innerHeight
 
       if (scrollHeight - pageYOffset - innerHeight === 0) {
-        this.$http
-          .get(
-            `http://comento.cafe24.com/request.php/?page=${
-              this.switchedSortOption === "asc" ? this.ord.asc : this.ord.desc
-            }`
-          )
-          .then(response => {
-            // 카테고리 필터링
-            const filteredList = this.filterListOnCategory(response.data.list)
-            if (this.switchedSortOption === "asc") {
-              const sortedList = this.sortToAsc(filteredList)
-              this.itemList = [...this.itemList, ...sortedList]
-            } else this.itemList = [...this.itemList, ...filteredList]
-            if (this.switchedSortOption === "asc") this.ord.asc--
-            else this.ord.desc++
-          })
+        const promise1 = this.$http.get(
+          `http://comento.cafe24.com/request.php/?page=${
+            this.switchedSortOption === "asc" ? this.ord.asc : this.ord.desc
+          }`
+        )
+
+        const promise2 =
+          this.adsList.length < 5
+            ? this.$http.get(
+              `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
+            )
+            : null
+
+        Promise.all([promise1, promise2]).then(response => {
+          // 카테고리 필터링
+          const filteredList = this.filterListOnCategory(response[0].data.list)
+          if (this.switchedSortOption === "asc") {
+            const sortedList = this.sortToAsc(filteredList)
+            // 광고 삽입 로직
+            if (response[1]) {
+              this.adsList = [...this.adsList, ...response[1].data.list]
+              this.adsListPage++
+            }
+            this.insertAds(sortedList)
+            this.itemList = [...this.itemList, ...sortedList]
+          } else {
+            // 광고 삽입 로직
+            if (response[1]) {
+              this.adsList = [...this.adsList, ...response[1].data.list]
+              this.adsListPage++
+            }
+            this.insertAds(filteredList)
+            this.itemList = [...this.itemList, ...filteredList]
+          }
+          if (this.switchedSortOption === "asc") this.ord.asc--
+          else this.ord.desc++
+        })
       }
     }
   },
@@ -152,13 +213,23 @@ export default {
   mounted () {
     console.log("Component mounted.")
     window.addEventListener("scroll", this.requestListWhenScroll)
-    this.$http
-      .get(`http://comento.cafe24.com/request.php/?page=${this.ord.desc - 1}`)
-      .then(response => {
-        this.itemList = [...response.data.list]
-      })
+
+    const promise1 = this.$http.get(
+      `http://comento.cafe24.com/request.php/?page=${this.ord.desc - 1}`
+    )
+
+    const promise2 = this.$http.get(
+      `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
+    )
+
+    Promise.all([promise1, promise2]).then(response => {
+      this.adsList = response[1].data.list
+      this.insertAds(response[0].data.list)
+      this.itemList = [...response[0].data.list]
+      this.adsListPage++
+    })
+
     this.$http.get(`http://comento.cafe24.com/category.php`).then(response => {
-      console.log(response)
       this.categoryInfo = response.data.list
       this.categoryLists = this.makeCategoryList()
       this.category = this.makeCategory()
