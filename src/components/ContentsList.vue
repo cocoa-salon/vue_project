@@ -32,6 +32,10 @@ export default {
   data: () => ({
     itemList: [],
     isModalOn: false,
+    ord: {
+      asc: 100,
+      desc: 2
+    },
     isCategoryChecked: {
       category1: true,
       category2: true,
@@ -53,6 +57,19 @@ export default {
     },
     getSearch () {
       console.log("API 요청")
+    },
+    scrollRequestApi () {
+      const scrollHeight = document.documentElement.scrollHeight
+      const pageYOffset = window.pageYOffset
+      const innerHeight = window.innerHeight
+      if (scrollHeight - pageYOffset - innerHeight === 0) {
+        this.$http
+          .get(`http://comento.cafe24.com/request.php/?page=${this.ord.desc}`)
+          .then(response => {
+            this.itemList = [...this.itemList, ...response.data.list]
+            this.ord.desc++
+          })
+      }
     }
   },
   // 컴포넌트 마운트 시 글 리스트 10개 GET 요청
@@ -62,8 +79,8 @@ export default {
       .get("http://comento.cafe24.com/request.php/?page=1")
       .then(response => {
         this.itemList = [...response.data.list]
-        console.log(this.itemList)
       })
+    window.addEventListener("scroll", this.scrollRequestApi)
   }
 }
 </script>
