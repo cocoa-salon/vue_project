@@ -4,6 +4,7 @@
       v-if="isModalOn"
       v-on:update-check="updateCheck"
       v-on:toggle-modal="toggleModal"
+      v-on:save-option="getSearch"
       v-bind:isCategoryChecked="isCategoryChecked"
       v-bind:isModalOn="isModalOn"
     />
@@ -13,7 +14,7 @@
       <button class="btn btn-danger">내림차순</button>
     </div>
     <div class="items-section">
-      <ItemsContainer v-bind:myNum="myNum" />
+      <ItemsContainer v-bind:itemList="itemList" />
     </div>
   </div>
 </template>
@@ -28,9 +29,8 @@ export default {
     ItemsContainer,
     FilterModal
   },
-  name: "ContentsList",
   data: () => ({
-    myNum: 12345,
+    itemList: [],
     isModalOn: false,
     isCategoryChecked: {
       category1: true,
@@ -58,6 +58,12 @@ export default {
   // 컴포넌트 마운트 시 글 리스트 10개 GET 요청
   mounted () {
     console.log("Component mounted.")
+    this.$http
+      .get("http://comento.cafe24.com/request.php/?page=1")
+      .then(response => {
+        this.itemList = [...response.data.list]
+        console.log(this.itemList)
+      })
   }
 }
 </script>

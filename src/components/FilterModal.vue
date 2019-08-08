@@ -18,7 +18,7 @@ export default {
   methods: {
     // 부모 메서드 호출(카테고리 별 GET 요청)
     saveOption () {
-      console.log("저장")
+      this.$emit('save-option')
     },
     // 부모 메서드 호출(체크 상태 업데이트)
     handleCheck (e) {
@@ -29,6 +29,7 @@ export default {
     // 부모 메서드 호출(모달 창 토글)
     handleModalToggle () {
       this.$emit('toggle-modal')
+      // CSS 속성 설정
     }
   }
 }
