@@ -89,8 +89,8 @@ export default {
     // 저장 버튼 클릭 시 카테고리 조건에 따라 리스트 요청
     requestFilteredList () {
       this.category = this.makeCategory()
-      console.log(this.category)
       this.requestListAfterSwitchSort((this.ord.desc = 1))
+      this.ord.desc++
     },
 
     // 카테고리 옵션에 따라 리스트 필터링
