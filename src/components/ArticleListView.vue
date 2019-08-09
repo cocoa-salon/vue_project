@@ -1,5 +1,5 @@
 <template>
-  <div class="contentslist-area">
+  <div class="articleList-view-area">
     <FilterModal
       v-if="isModalOn"
       v-on:toggle-modal="toggleModal"
@@ -14,7 +14,7 @@
       <button class="btn btn-danger" @click="switchSortOptionToDesc">내림차순</button>
     </div>
     <div class="items-section">
-      <ItemsContainer
+      <ContentsContainer
         v-bind:itemList="itemList"
         v-bind:adsList="adsList"
       />
@@ -24,12 +24,12 @@
 
 
 <script>
-import ItemsContainer from "./ItemsContainer"
-import FilterModal from "./FilterModal"
+import ContentsContainer from "./Contents/ContentsContainer"
+import FilterModal from "./FilterModal/FilterModal"
 
 export default {
   components: {
-    ItemsContainer,
+    ContentsContainer,
     FilterModal
   },
   data: () => ({

@@ -5,21 +5,21 @@
         광고 배너 {{item.no}}
         <AdsBanner v-bind:adsItem="item" />
       </div>
-      <Items v-else v-bind:item="item" />
+      <ArticleItems v-else v-bind:item="item" />
     </li>
   </ul>
 </template>
 
 <script>
-import Items from "./Items"
-import AdsBanner from "./Contents/AdsBanner"
+import ArticleItems from "./ArticleItems"
+import AdsBanner from "./AdsBanner"
 
 export default {
   components: {
-    Items,
+    ArticleItems,
     AdsBanner
   },
-  name: "ItemsContainer",
+  name: "ContentsContainer",
   props: ["itemList"]
 }
 </script>

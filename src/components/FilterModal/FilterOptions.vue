@@ -12,7 +12,7 @@
 <script>
 
 export default {
-  name: "CategoryOption",
+  name: "FilterOptions",
   props: ["info", "categoryLists"]
 }
 </script>

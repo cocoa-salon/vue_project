@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="filter-modal">
     <h3>필터</h3>
     <div style="cursor:pointer" @click="handleModalToggle">X</div>
     <div class="category-check">
-      <CategoryOption
+      <FilterOptions
         v-for="(info, index) in categoryInfo"
         v-bind:key="index"
         v-bind:info="info"
@@ -16,12 +16,12 @@
 
 
 <script>
-import CategoryOption from "./CategoryOption"
+import FilterOptions from "./FilterOptions"
 
 export default {
   props: ["isModalOn", "categoryInfo", "categoryLists"],
   components: {
-    CategoryOption
+    FilterOptions
   },
   methods: {
     // 부모 메서드 호출(카테고리 별 GET 요청)
