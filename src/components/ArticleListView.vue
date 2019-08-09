@@ -8,17 +8,19 @@
       v-bind:categoryInfo="categoryInfo"
       v-bind:categoryLists="categoryLists"
     />
-    <div class="nav-tool">
-      <button class="btn btn-info" @click="toggleModal">필터</button>
-      <button class="btn btn-primary" @click="switchSortOptionToAsc">오름차순</button>
-      <button class="btn btn-danger" @click="switchSortOptionToDesc">내림차순</button>
-    </div>
-    <div class="items-section">
-      <ContentsContainer
-        v-bind:itemList="itemList"
-        v-bind:adsList="adsList"
-      />
-    </div>
+    <div v-if="isModalOn" class="dimmed-layer" />
+      <div class="search-menu">
+        <div class="filter-area">
+          <button class="btn btn-info" @click="toggleModal">필터</button>
+        </div>
+        <div class="sort-option-area">
+          <button class="btn btn-primary" @click="switchSortOptionToAsc">오름차순</button>
+          <button class="btn btn-danger" @click="switchSortOptionToDesc">내림차순</button>
+        </div>
+      </div>
+      <div class="items-section">
+        <ContentsContainer v-bind:itemList="itemList" v-bind:adsList="adsList" />
+      </div>
   </div>
 </template>
 
@@ -107,7 +109,7 @@ export default {
     // 광고 삽입 로직
     insertAds (sortedList) {
       for (let v of this.adsList) {
-        v['isAd'] = true
+        v["isAd"] = true
         sortedList.splice(this.currentIndex, 0, v)
         this.count++
         this.currentIndex += this.standardNum
@@ -137,11 +139,13 @@ export default {
     requestListAfterSwitchSort (pageNum, sortLogic) {
       this.currentIndex = 3
       this.adsListPage = 1
-      const promise1 = this.$http
-        .get(`http://comento.cafe24.com/request.php/?page=${pageNum}`)
+      const promise1 = this.$http.get(
+        `http://comento.cafe24.com/request.php/?page=${pageNum}`
+      )
 
-      const promise2 =
-            this.$http.get(`http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`)
+      const promise2 = this.$http.get(
+        `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
+      )
 
       Promise.all([promise1, promise2]).then(response => {
         // 카테고리 필터링
@@ -240,3 +244,24 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+@import "../styles/style.less";
+
+.search-menu {
+  .flex-default();
+  justify-content: space-between;
+}
+
+.dimmed-layer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9;
+  background-color:#000;
+  opacity: 0.7;
+}
+</style>

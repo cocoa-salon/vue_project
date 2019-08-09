@@ -1,9 +1,15 @@
 <template>
-  <div>
+  <div class="ads-area">
     <div class="sponsored-text">Sponsored</div>
-    <img v-bind:src="'http://comento.cafe24.com/public/images/'+adsItem.img" />
-    <div class="ads-title">{{adsItem.title}}</div>
-    <div class="ads-content">{{adsItem.contents}}</div>
+    <div class="ads-box">
+      <div class="ads-image">
+        <img v-bind:src="'http://comento.cafe24.com/public/images/'+adsItem.img" />
+      </div>
+      <div class=ads-info>
+        <div class="ads-title">{{adsItem.title}}</div>
+        <div class="ads-content">{{adsItem.contents}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -14,14 +20,14 @@ export default {
 </script>
 
 <style lang="less">
-@import '../../styles/style.less';
+@import "../../styles/style.less";
 
 .ads-title {
   .text-left-title();
 }
 
 .ads-content {
-   height: 20px;
+  height: 20px;
   .text-overflow();
 }
 
