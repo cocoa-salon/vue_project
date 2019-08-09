@@ -9,21 +9,28 @@
       v-bind:categoryLists="categoryLists"
     />
     <div v-if="isModalOn" class="dimmed-layer" />
-      <div class="search-menu">
-        <div class="filter-area">
-          <button class="btn btn-info" @click="toggleModal">필터</button>
-        </div>
-        <div class="sort-option-area">
-          <button class="btn btn-primary" @click="switchSortOptionToAsc">오름차순</button>
-          <button class="btn btn-danger" @click="switchSortOptionToDesc">내림차순</button>
-        </div>
+    <div class="search-menu">
+      <div class="filter-area">
+        <button class="btn btn-primary" @click="toggleModal">필터</button>
       </div>
-      <div class="items-section">
-        <ContentsContainer v-bind:itemList="itemList" v-bind:adsList="adsList" />
+      <div class="sort-option-area">
+        <div
+          class="sort-button"
+          v-bind:class="{ clicked: !sortBtnClicked }"
+          @click="switchSortOptionToAsc"
+        >오름차순</div>
+        <div
+          class="sort-button"
+          v-bind:class="{ clicked: sortBtnClicked }"
+          @click="switchSortOptionToDesc"
+        >내림차순</div>
       </div>
+    </div>
+    <div class="items-section">
+      <ContentsContainer v-bind:itemList="itemList" v-bind:adsList="adsList" />
+    </div>
   </div>
 </template>
-
 
 <script>
 import ContentsContainer from "./Contents/ContentsContainer"
@@ -50,7 +57,8 @@ export default {
     standardNum: 4,
     listLength: 10,
     currentIndex: 3,
-    count: 0
+    count: 0,
+    sortBtnClicked: true
   }),
   methods: {
     // X버튼 : 모달 창 토글
@@ -84,6 +92,7 @@ export default {
 
     // 정렬 옵션 오름차순 전환
     switchSortOptionToAsc () {
+      this.sortBtnClicked = !this.sortBtnClicked
       this.switchedSortOption = "asc"
       this.requestListAfterSwitchSort((this.ord.asc = 100), this.sortToAsc)
       this.ord.asc--
@@ -92,6 +101,7 @@ export default {
 
     // 정렬 옵션 내림차순 전환
     switchSortOptionToDesc () {
+      this.sortBtnClicked = !this.sortBtnClicked
       this.switchedSortOption = "desc"
       this.requestListAfterSwitchSort((this.ord.desc = 1))
       this.ord.desc++
@@ -251,6 +261,7 @@ export default {
 .search-menu {
   .flex-default();
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .dimmed-layer {
@@ -261,7 +272,21 @@ export default {
   left: 0;
   top: 0;
   z-index: 9;
-  background-color:#000;
+  background-color: #000;
   opacity: 0.7;
+}
+
+.sort-option-area {
+  .flex-default();
+  justify-content: space-around;
+}
+
+.sort-button {
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.clicked {
+  color: red;
 }
 </style>
