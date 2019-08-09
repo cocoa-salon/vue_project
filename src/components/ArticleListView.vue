@@ -66,6 +66,7 @@ export default {
       this.isModalOn = !this.isModalOn
     },
 
+    // (필터)카테고리 정보 객체 생성
     makeCategoryList () {
       return this.categoryInfo.reduce((acc, v, i) => {
         let obj = {}
@@ -76,6 +77,7 @@ export default {
       }, {})
     },
 
+    // 콘텐츠 필터링을 위한 카테고리 배열 생성
     makeCategory () {
       let arr = Object.keys(this.categoryLists)
       return arr.filter((v, i) => {

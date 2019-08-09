@@ -12,11 +12,7 @@
       <div v-if="replies.length === 0">댓글이 없습니다.</div>
       <ul v-else class="list-group">
         <span>댓글</span>
-        <li
-          class="list-group-item"
-          v-for="(reply, index) in replies"
-          v-bind:key="index"
-        >
+        <li class="list-group-item" v-for="(reply, index) in replies" v-bind:key="index">
           <Replies v-bind:reply="reply" />
         </li>
       </ul>
@@ -25,7 +21,6 @@
 </template>
 
 <script>
-
 import Replies from "./Replies"
 
 export default {
@@ -58,7 +53,7 @@ export default {
 </script>
 
 <style lang="less">
-@import '../../styles/style.less';
+@import "../../styles/style.less";
 
 .article-info {
   .flex-default();
@@ -77,4 +72,12 @@ export default {
   height: auto;
   text-align: left;
 }
+
+.title-content {
+  overflow: visible;
+  white-space: normal;
+}
+
 </style>
+
+
