@@ -16,12 +16,12 @@
       <div class="sort-option-area">
         <div
           class="sort-button"
-          v-bind:class="{ clicked: !sortBtnClicked }"
+          v-bind:class="{ clicked: sortBtnClicked }"
           @click="switchSortOptionToAsc"
         >오름차순</div>
         <div
           class="sort-button"
-          v-bind:class="{ clicked: sortBtnClicked }"
+          v-bind:class="{ clicked: !sortBtnClicked }"
           @click="switchSortOptionToDesc"
         >내림차순</div>
       </div>
@@ -48,7 +48,7 @@ export default {
       asc: 100,
       desc: 2
     },
-    switchedSortOption: "desc",
+    switchedSortOption: "asc",
     categoryInfo: {},
     category: [],
     categoryLists: {},
@@ -95,6 +95,7 @@ export default {
       this.sortBtnClicked = !this.sortBtnClicked
       this.switchedSortOption = "asc"
       this.requestListAfterSwitchSort((this.ord.asc = 100), this.sortToAsc)
+      this.ord.desc = 1
       this.ord.asc--
       // 응답 데이터 배열 내부에서 다시 오름차순으로 정렬해야 한다.
     },
@@ -105,15 +106,18 @@ export default {
       this.switchedSortOption = "desc"
       this.requestListAfterSwitchSort((this.ord.desc = 1))
       this.ord.desc++
+      this.ord.asc = 100
     },
 
     // 저장 버튼 클릭 시 카테고리 조건에 따라 리스트 요청
     requestFilteredList () {
+      this.sortBtnClicked = true
+      this.switchedSortOption = "asc"
       this.adsList = []
       this.itemList = []
       this.category = this.makeCategory()
-      this.requestListAfterSwitchSort((this.ord.desc = 1))
-      this.ord.desc++
+      this.requestListAfterSwitchSort((this.ord.asc = 100), this.sortToAsc)
+      this.ord.asc--
     },
 
     // 광고 삽입 로직
@@ -160,7 +164,6 @@ export default {
       Promise.all([promise1, promise2]).then(response => {
         // 카테고리 필터링
         const filteredList = this.filterListOnCategory(response[0].data.list)
-        // console.log(filteredList)
         this.adsList = response[1].data.list
         if (sortLogic) {
           // 정렬 로직 적용
@@ -232,7 +235,7 @@ export default {
     window.addEventListener("scroll", this.requestListWhenScroll)
 
     const promise1 = this.$http.get(
-      `http://comento.cafe24.com/request.php/?page=${this.ord.desc - 1}`
+      `http://comento.cafe24.com/request.php/?page=${this.ord.asc}`
     )
 
     const promise2 = this.$http.get(
@@ -241,8 +244,10 @@ export default {
 
     Promise.all([promise1, promise2]).then(response => {
       this.adsList = response[1].data.list
-      this.insertAds(response[0].data.list)
-      this.itemList = [...response[0].data.list]
+      const sortedList = this.sortToAsc(response[0].data.list)
+      this.insertAds(sortedList)
+      this.itemList = [...sortedList]
+      this.ord.asc--
       this.adsListPage++
     })
 
