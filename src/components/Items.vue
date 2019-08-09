@@ -3,6 +3,7 @@
     <div>
       <div class="category-name">카테고리명 {{item.category_no}}</div>
       <div class="item-no">글번호 {{item.no}}</div>
+      <div class="item-no">이용자 번호 {{item.user_no}}</div>
     </div>
     <div class="item-info">
       <div class="user-email">이메일 {{item.email}}</div>
@@ -12,7 +13,7 @@
       <div class="title-name">글 제목 {{item.title}}</div>
       <div class="title-content">글 내용 {{item.contents}}</div>
     </div>
-    <router-link :to="{ name: 'ListDetail', params: { no: item.no }}">내용 보기</router-link>
+    <router-link :to="{ name: 'ArticleDetail', params: { no: item.no }}">내용 보기</router-link>
   </div>
 </template>
 

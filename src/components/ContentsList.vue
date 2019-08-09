@@ -14,7 +14,10 @@
       <button class="btn btn-danger" @click="switchSortOptionToDesc">내림차순</button>
     </div>
     <div class="items-section">
-      <ItemsContainer v-bind:itemList="itemList" />
+      <ItemsContainer
+        v-bind:itemList="itemList"
+        v-bind:adsList="adsList"
+      />
     </div>
   </div>
 </template>

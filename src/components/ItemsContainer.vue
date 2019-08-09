@@ -3,7 +3,7 @@
     <li class="list-group-item" v-for="(item, index) in itemList" v-bind:key="index">
       <div v-if="item.isAd">
         광고 배너 {{item.no}}
-        <img v-bind:src="'http://comento.cafe24.com/public/images/'+item.img" >
+        <AdsBanner v-bind:adsItem="item" />
       </div>
       <Items v-else v-bind:item="item" />
     </li>
@@ -12,10 +12,12 @@
 
 <script>
 import Items from "./Items"
+import AdsBanner from "./Contents/AdsBanner"
 
 export default {
   components: {
-    Items
+    Items,
+    AdsBanner
   },
   name: "ItemsContainer",
   props: ["itemList"]

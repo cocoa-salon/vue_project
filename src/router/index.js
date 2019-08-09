@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import ContentsList from '@/components/ContentsList'
-import ListDetail from '@/components/ListDetail'
+import ArticleDetail from '@/components/ArticleDetail'
 
 Vue.use(Router)
 
@@ -14,8 +14,8 @@ export default new Router({
     },
     {
       path: '/detail/article/:no',
-      name: 'ListDetail',
-      component: ListDetail,
+      name: 'ArticleDetail',
+      component: ArticleDetail,
       props: true
     }
   ]
