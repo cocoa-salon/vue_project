@@ -12,6 +12,7 @@
       <div class="title-name">글 제목 {{item.title}}</div>
       <div class="title-content">글 내용 {{item.contents}}</div>
     </div>
+    <router-link :to="{ name: 'ListDetail', params: { no: item.no }}">내용 보기</router-link>
   </div>
 </template>
 
