@@ -42,32 +42,54 @@ export default {
     FilterModal
   },
   data: () => ({
+    // 콘텐츠 아이템 리스트
     itemList: [],
+
+    // 모달 토글 여부
     isModalOn: false,
+
+    // 오름차순, 내림차순 초기 번호
     ord: {
       asc: 100,
       desc: 2
     },
+
+    // 선택된 정렵 옵션
     switchedSortOption: "asc",
+
+    // 카테고리 API 응답 객체
     categoryInfo: {},
-    category: [],
+    // 카테고리 옵션
     categoryLists: {},
+    // 필터링을 위한 카테고리 목록
+    category: [],
+
+    // 광고 삽입 관련
     adsList: [],
     adsListPage: 1,
     standardNum: 4,
     listLength: 10,
     currentIndex: 3,
-    count: 0,
-    sortBtnClicked: true
+    insertedCount: 0,
+
+    // 정렬 버튼 클릭 여부
+    sortBtnClicked: true,
+
+    GET_API: {
+      contentsList: `http://comento.cafe24.com/request.php/?page=`,
+      adsList: `http://comento.cafe24.com/ads.php/?page=`,
+      category: `http://comento.cafe24.com/category.php`
+    }
+
   }),
   methods: {
-    // X버튼 : 모달 창 토글
+    // X버튼(모달 창 토글)
     toggleModal () {
       this.isModalOn = !this.isModalOn
     },
 
     // (필터)카테고리 정보 객체 생성
-    makeCategoryList () {
+    generateCategoryList () {
       return this.categoryInfo.reduce((acc, v, i) => {
         let obj = {}
         obj.no = v["no"]
@@ -78,7 +100,7 @@ export default {
     },
 
     // 콘텐츠 필터링을 위한 카테고리 배열 생성
-    makeCategory () {
+    generateCategory () {
       let arr = Object.keys(this.categoryLists)
       return arr.filter((v, i) => {
         if (this.categoryLists[v]["checked"]) {
@@ -99,7 +121,6 @@ export default {
       this.requestListAfterSwitchSort((this.ord.asc = 100), this.sortToAsc)
       this.ord.desc = 1
       this.ord.asc--
-      // 응답 데이터 배열 내부에서 다시 오름차순으로 정렬해야 한다.
     },
 
     // 정렬 옵션 내림차순 전환
@@ -117,7 +138,7 @@ export default {
       this.switchedSortOption = "asc"
       this.adsList = []
       this.itemList = []
-      this.category = this.makeCategory()
+      this.category = this.generateCategory()
       this.requestListAfterSwitchSort((this.ord.asc = 100), this.sortToAsc)
       this.ord.asc--
     },
@@ -127,12 +148,12 @@ export default {
       for (let v of this.adsList) {
         v["isAd"] = true
         sortedList.splice(this.currentIndex, 0, v)
-        this.count++
+        this.insertedCount++
         this.currentIndex += this.standardNum
         if (this.currentIndex >= this.listLength + 3) {
           this.currentIndex -= this.listLength + 3
-          this.adsList.splice(0, this.count)
-          this.count = 0
+          this.adsList.splice(0, this.insertedCount)
+          this.insertedCount = 0
           return
         }
       }
@@ -155,15 +176,16 @@ export default {
     requestListAfterSwitchSort (pageNum, sortLogic) {
       this.currentIndex = 3
       this.adsListPage = 1
-      const promise1 = this.$http.get(
-        `http://comento.cafe24.com/request.php/?page=${pageNum}`
+
+      const promiseContentsList = this.$http.get(
+        this.GET_API.contentsList + pageNum
       )
 
-      const promise2 = this.$http.get(
-        `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
+      const promiseAdsList = this.$http.get(
+        this.GET_API.adsList + this.adsListPage
       )
 
-      Promise.all([promise1, promise2]).then(response => {
+      Promise.all([promiseContentsList, promiseAdsList]).then(response => {
         // 카테고리 필터링
         const filteredList = this.filterListOnCategory(response[0].data.list)
         this.adsList = response[1].data.list
@@ -183,27 +205,24 @@ export default {
       })
     },
 
-    // 스크롤링 시 리스트 요청
+    // 스크롤 시 리스트 요청
     requestListWhenScroll () {
       const scrollHeight = document.documentElement.scrollHeight
       const pageYOffset = window.pageYOffset
       const innerHeight = window.innerHeight
 
       if (scrollHeight - pageYOffset - innerHeight === 0) {
-        const promise1 = this.$http.get(
-          `http://comento.cafe24.com/request.php/?page=${
+        const promiseContentsList = this.$http.get(
+          this.GET_API.contentsList + `${
             this.switchedSortOption === "asc" ? this.ord.asc : this.ord.desc
           }`
         )
 
-        const promise2 =
-          this.adsList.length < 5
-            ? this.$http.get(
-              `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
-            )
+        const promiseAdsList =
+          this.adsList.length < 5 ? this.$http.get(this.GET_API.adsList + this.adsListPage)
             : null
 
-        Promise.all([promise1, promise2]).then(response => {
+        Promise.all([promiseContentsList, promiseAdsList]).then(response => {
           // 카테고리 필터링
           const filteredList = this.filterListOnCategory(response[0].data.list)
           if (this.switchedSortOption === "asc") {
@@ -236,15 +255,15 @@ export default {
     console.log("Component mounted.")
     window.addEventListener("scroll", this.requestListWhenScroll)
 
-    const promise1 = this.$http.get(
-      `http://comento.cafe24.com/request.php/?page=${this.ord.asc}`
+    const promiseContentsList = this.$http.get(
+      this.GET_API.contentsList + this.ord.asc
     )
 
-    const promise2 = this.$http.get(
-      `http://comento.cafe24.com/ads.php/?page=${this.adsListPage}`
+    const promiseAdsList = this.$http.get(
+      this.GET_API.adsList + this.adsListPage
     )
 
-    Promise.all([promise1, promise2]).then(response => {
+    Promise.all([promiseContentsList, promiseAdsList]).then(response => {
       this.adsList = response[1].data.list
       const sortedList = this.sortToAsc(response[0].data.list)
       this.insertAds(sortedList)
@@ -253,10 +272,11 @@ export default {
       this.adsListPage++
     })
 
-    this.$http.get(`http://comento.cafe24.com/category.php`).then(response => {
+    // 카테고리 리스트 요청
+    this.$http.get(this.GET_API.category).then(response => {
       this.categoryInfo = response.data.list
-      this.categoryLists = this.makeCategoryList()
-      this.category = this.makeCategory()
+      this.categoryLists = this.generateCategoryList()
+      this.category = this.generateCategory()
     })
   }
 }

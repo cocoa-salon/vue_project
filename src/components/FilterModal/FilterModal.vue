@@ -2,7 +2,7 @@
   <div class="filter-modal">
     <div class="filter-text">
       <div>필터</div>
-      <div style="cursor:pointer" @click="handleModalToggle">X</div>
+      <div class="close-button" style="cursor:pointer" @click="handleModalToggle">X</div>
     </div>
     <div class="category-check">
       <FilterOptions
@@ -17,7 +17,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import FilterOptions from "./FilterOptions"

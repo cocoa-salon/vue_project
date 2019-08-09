@@ -31,5 +31,4 @@ export default {
   text-align: left;
   height: auto;
 }
-
 </style>
