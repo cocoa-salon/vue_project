@@ -2,7 +2,6 @@
   <ul class="list-group">
     <li class="list-group-item" v-for="(item, index) in itemList" v-bind:key="index">
       <div v-if="item.isAd">
-        광고 배너 {{item.no}}
         <AdsBanner v-bind:adsItem="item" />
       </div>
       <ArticleItems v-else v-bind:item="item" />
@@ -23,4 +22,3 @@ export default {
   props: ["itemList"]
 }
 </script>
-

@@ -1,28 +1,51 @@
 <template>
   <div class="item-structure">
-    <div>
+    <div class="category-info">
       <div class="category-name">카테고리명 {{item.category_no}}</div>
       <div class="item-no">글번호 {{item.no}}</div>
-      <div class="item-no">이용자 번호 {{item.user_no}}</div>
     </div>
-    <div class="item-info">
-      <div class="user-email">이메일 {{item.email}}</div>
-      <div class="generated-date">작성일 {{item.updated_at}}</div>
+    <div class="content-box">
+      <div class="item-info">
+        <span class="user-email">{{item.email}}</span> |
+        <span class="generated-date">{{item.updated_at}}</span>
+      </div>
+      <div class="item-content">
+        <div class="title-name">{{item.title}}</div>
+        <p class="title-content">{{item.contents}}</p>
+      </div>
     </div>
-    <div class="item-content">
-      <div class="title-name">글 제목 {{item.title}}</div>
-      <div class="title-content">글 내용 {{item.contents}}</div>
-    </div>
-    <router-link :to="{ name: 'ArticleDetail', params: { no: item.no }}">내용 보기</router-link>
+    <router-link :to="{ name: 'ArticleDetail', params: { no: item.no }}">더보기</router-link>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "Items",
   props: ["item"]
 }
 </script>
 
+<style lang="less">
+@import '../../styles/style.less';
 
+.category-info {
+  .flex-default();
+  justify-content: space-between;
+}
+
+.item-info {
+  .text-left-title();
+}
+
+.item-content {
+  height: 40px;
+}
+
+.title-name {
+  .text-left-title();
+}
+
+.title-content {
+ .text-overflow();
+}
+</style>

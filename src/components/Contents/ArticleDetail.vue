@@ -1,22 +1,17 @@
 <template>
   <div class="article-detail-structure">
-    <div>
-      <div class="category-name">카테고리명 {{article.category_no}}</div>
-      <div class="item-no">글번호 {{article.no}}</div>
-      <div class="item-no">이용자 번호 {{article.user_no}}</div>
+    <div class="article-item-info">
+      <span class="user-email">{{article.email}}</span> |
+      <span class="generated-date">{{article.updated_at}}</span>
     </div>
-    <div class="item-info">
-      <div class="user-email">이메일 {{article.email}}</div>
-      <div class="generated-date">작성일 {{article.updated_at}}</div>
-    </div>
-    <div class="item-content">
-      <div class="title-name">글 제목 {{article.title}}</div>
-      <div class="title-content">글 내용 {{article.contents}}</div>
+    <div class="article-item-content">
+      <div class="title-name">{{article.title}}</div>
+      <p class="title-content">{{article.contents}}</p>
     </div>
     <div>
-      댓글
       <div v-if="replies.length === 0">댓글이 없습니다.</div>
       <ul v-else class="list-group">
+        <span>댓글</span>
         <li
           class="list-group-item"
           v-for="(reply, index) in replies"
@@ -61,3 +56,25 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+@import '../../styles/style.less';
+
+.article-info {
+  .flex-default();
+  justify-content: space-between;
+}
+
+.article-item-info {
+  .text-left-title();
+}
+
+.title-name {
+  .text-left-title();
+}
+
+.article-item-content {
+  height: auto;
+  text-align: left;
+}
+</style>
