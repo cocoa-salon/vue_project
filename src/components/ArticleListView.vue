@@ -192,17 +192,17 @@ export default {
         if (sortLogic) {
           // 정렬 로직 적용
           const sortedList = sortLogic(filteredList)
-          // 광고 삽입 로직
-          this.insertAds(sortedList)
-          this.itemList = [...sortedList]
-          this.adsListPage++
+          this.composeItemList(sortedList)
         } else {
-          // 광고 삽입 로직
-          this.insertAds(filteredList)
-          this.itemList = [...filteredList]
-          this.adsListPage++
+          this.composeItemList(filteredList)
         }
       })
+    },
+
+    composeItemList (list) {
+      this.insertAds(list)
+      this.itemList = [...list]
+      this.adsListPage++
     },
 
     // 스크롤 시 리스트 요청
