@@ -67,7 +67,7 @@ export default {
     // 광고 삽입 관련
     adsList: [],
     adsListPage: 1,
-    standardNum: 4,
+    KEY_NUM: 4,
     listLength: 10,
     currentIndex: 3,
     insertedCount: 0,
@@ -148,12 +148,19 @@ export default {
       for (let v of this.adsList) {
         v["isAd"] = true
         sortedList.splice(this.currentIndex, 0, v)
+        // console.log(this.currentIndex)
         this.insertedCount++
-        this.currentIndex += this.standardNum
-        if (this.currentIndex >= this.listLength + 3) {
+        this.currentIndex += this.KEY_NUM
+        if (this.currentIndex >= this.listLength + 4) {
+          // console.log("계산한 숫자: " + this.insertedCount)
+          // console.log(this.currentIndex)
           this.currentIndex -= this.listLength + 3
           this.adsList.splice(0, this.insertedCount)
           this.insertedCount = 0
+          if (this.currentIndex === 4) {
+            this.currentIndex = 3
+          }
+          // console.log("남은 광고 개수: " + this.adsList.length)
           return
         }
       }
@@ -219,7 +226,7 @@ export default {
         )
 
         const promiseAdsList =
-          this.adsList.length < 5 ? this.$http.get(this.GET_API.adsList + this.adsListPage)
+          this.adsList.length === 0 ? this.$http.get(this.GET_API.adsList + this.adsListPage)
             : null
 
         Promise.all([promiseContentsList, promiseAdsList]).then(response => {
